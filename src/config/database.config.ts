@@ -1,4 +1,3 @@
-
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as path from 'path';
 

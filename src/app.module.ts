@@ -4,13 +4,8 @@ import configuration, { configValidationSchema } from './config/app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/database.config';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { ScheduleModule } from '@nestjs/schedule';
-import { CacheModule } from '@nestjs/cache-manager';
-
 import { RedisModule } from './modules/redis/redis.module';
-
 
 // Import your feature modules
 // import { UsersModule } from './modules/users/users.module';
@@ -35,11 +30,10 @@ import { RedisModule } from './modules/redis/redis.module';
       envFilePath: ['.env.local', '.env'],
     }),
 
-    // 2. Database Module - FIXED: Don't use spread operator
+    // 2. Database Module
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        // Don't use: ...typeOrmConfig (causes type issues)
         type: 'postgres',
         host: configService.get<string>('config.database.host', 'localhost'),
         port: configService.get<number>('config.database.port', 5432),
