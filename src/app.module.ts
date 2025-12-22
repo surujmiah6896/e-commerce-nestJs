@@ -3,6 +3,22 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration, { configValidationSchema } from './config/app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeOrmConfig } from './config/database.config';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@nestjs/cache-manager';
+
+import { RedisModule } from './modules/redis/redis.module';
+
+
+// Import your feature modules
+// import { UsersModule } from './modules/users/users.module';
+// import { AuthModule } from './modules/auth/auth.module';
+// import { ProductsModule } from './modules/products/products.module';
+// import { CategoriesModule } from './modules/categories/categories.module';
+// import { OrdersModule } from './modules/orders/orders.module';
+// import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -18,6 +34,68 @@ import { AppService } from './app.service';
       cache: true,
       envFilePath: ['.env.local', '.env'],
     }),
+
+    // 2. Database Module - FIXED: Don't use spread operator
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        // Don't use: ...typeOrmConfig (causes type issues)
+        type: 'postgres',
+        host: configService.get<string>('config.database.host', 'localhost'),
+        port: configService.get<number>('config.database.port', 5432),
+        username: configService.get<string>(
+          'config.database.username',
+          'postgres',
+        ),
+        password: configService.get<string>(
+          'config.database.password',
+          'password',
+        ),
+        database: configService.get<string>(
+          'config.database.database',
+          'ecommerce_db',
+        ),
+        synchronize: configService.get<boolean>(
+          'config.database.synchronize',
+          false,
+        ),
+        logging: configService.get<boolean>('config.database.logging', false),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+        migrationsTableName: 'typeorm_migrations',
+        extra: {
+          max: parseInt(process.env.DB_MAX_CONNECTIONS || '10', 10),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+
+    RedisModule,
+
+    // 4. Rate Limiting Module - FIXED: Return proper ThrottlerModuleOptions
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: configService.get<number>('config.security.rateLimit.ttl', 60),
+            limit: configService.get<number>(
+              'config.security.rateLimit.limit',
+              100,
+            ),
+          },
+        ],
+      }),
+      inject: [ConfigService],
+    }),
+
+    // 6. Your Feature Modules
+    // HealthModule,
+    // AuthModule,
+    // UsersModule,
+    // ProductsModule,
+    // CategoriesModule,
+    // OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
