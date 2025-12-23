@@ -10,6 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Use npm install with --legacy-peer-deps flag
+# Install dependencies and rebuild bcrypt
 RUN npm install --legacy-peer-deps
 
 # Copy source code

@@ -53,7 +53,7 @@ import { UsersModule } from './modules/users/users.module';
         ),
         synchronize: configService.get<boolean>(
           'config.database.synchronize',
-          false,
+          true,
         ),
         logging: configService.get<boolean>('config.database.logging', false),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
@@ -85,7 +85,7 @@ import { UsersModule } from './modules/users/users.module';
       inject: [ConfigService],
     }),
 
-    AuthModule, 
+    // AuthModule, 
 
     UsersModule,
 

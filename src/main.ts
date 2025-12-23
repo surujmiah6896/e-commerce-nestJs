@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -41,9 +42,30 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(port || 3000);
-  console.log(
-    `Application is running on: http://localhost:${port}/${apiPrefix}`,
-  );
+  // Swagger Documentation
+  const config = new DocumentBuilder()
+    .setTitle('NestJS User Authentication API')
+    .setDescription('Complete user authentication system with JWT')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+
+  // Start server
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Swagger Docs: http://localhost:${port}/api/docs`);
 }
 bootstrap();

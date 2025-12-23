@@ -7,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { toUserResponseDto, UserResponseDto } from './dto/user-response.dto';
+import { LoginResponseDto, RegisterResponseDto } from './dto/login-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +20,7 @@ export class UsersService {
   ) {}
 
   // Create new user
-  async create(
-    createUserDto: CreateUserDto,
-  ): Promise<{ user: Omit<User, 'password'>; token: string }> {
+  async create(createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
     //check if user exists
     const existingUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
@@ -39,60 +39,67 @@ export class UsersService {
     // Generate JWT token
     const token = this.generateToken(user);
 
-    // Remove password from response
-    const { password, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword, token };
+    // Convert to response DTO
+    return {
+      user: toUserResponseDto(user),
+      token,
+    };
   }
 
   //Login user
-  async login(
-    loginDto: LoginDto,
-  ): Promise<{ user: Omit<User, 'password'>; token: string }> {
+  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
     });
 
     if (!user) {
-      throw new Error('Invalid credentials');
-    }
-    const isPasswordValid = await user.validatePassword(loginDto.password);
-    if (!isPasswordValid) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    //check if user is active
+    // Validate password using bcrypt directly
+    const isValidPassword = await this.validatePassword(
+      loginDto.password,
+      user.password,
+    );
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if user is active
     if (!user.isActive) {
-      throw new Error('User account is inactive');
+      throw new UnauthorizedException('Account is deactivated');
     }
 
     // Generate JWT token
     const token = this.generateToken(user);
 
-    // Remove password from response
-    const { password, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword, token };
+    // Convert to response DTO
+    return {
+      user: toUserResponseDto(user),
+      token,
+    };
   }
 
   // Find all users
-  async findAll(): Promise<Omit<User, 'password'>[]> {
+  async findAll(): Promise<UserResponseDto[]> {
     const users = await this.userRepository.find();
-    return users.map(({ password, ...user }) => user);
+    return users.map((user) => toUserResponseDto(user));
   }
 
   // Find user by ID
-  async findOne(id: string): Promise<Omit<User, 'password'>> {
+  async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return toUserResponseDto(user);
   }
 
   // Find user by email (for auth)
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { email } });
   }
 
@@ -100,7 +107,7 @@ export class UsersService {
   async update(
     id: string,
     updateUserDto: UpdateUserDto,
-  ): Promise<Omit<User, 'password'>> {
+  ): Promise<UserResponseDto> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -118,15 +125,14 @@ export class UsersService {
     Object.assign(user, updateUserDto);
     await this.userRepository.save(user);
 
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return toUserResponseDto(user);
   }
 
   //Delete user (soft delete)
   async remove(id: string): Promise<void> {
     const result = await this.userRepository.softDelete(id);
-    if(result.affected == 0){
-        throw new NotFoundException(`User with ID ${id} not found`);
+    if (result.affected == 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
   }
 
@@ -139,19 +145,28 @@ export class UsersService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: this.configService.get<string>('jwt.expiresIn'),
+      secret: this.configService.get<string>('config.jwt.secret'),
+      expiresIn: this.configService.get<string>('config.jwt.expiresIn'),
     });
   }
 
+  // Helper method to validate password
+  private async validatePassword(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    const bcrypt = await import('bcryptjs');
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
   // Validate Jwt token
-  async validateToken(token: string): Promise<any>{
+  async validateToken(token: string): Promise<any> {
     try {
-        return this.jwtService.verify(token,{
-            secret: this.configService.get<string>('jwt.secret'),
-        });
+      return this.jwtService.verify(token, {
+        secret: this.configService.get<string>('jwt.secret'),
+      });
     } catch (error) {
-        throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Invalid token');
     }
   }
 }
