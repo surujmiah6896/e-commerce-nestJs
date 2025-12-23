@@ -15,71 +15,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
-
-  // Create new user
-  async create(createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
-    //check if user exists
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
-    if (existingUser) {
-      throw new Error('User with this email already exists');
-    }
-
-    // Create user entity
-    const user = this.userRepository.create({
-      ...createUserDto,
-      roles: createUserDto.roles || ['user'],
-    });
-    await this.userRepository.save(user);
-
-    // Generate JWT token
-    const token = this.generateToken(user);
-
-    // Convert to response DTO
-    return {
-      user: toUserResponseDto(user),
-      token,
-    };
-  }
-
-  //Login user
-  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    const user = await this.userRepository.findOne({
-      where: { email: loginDto.email },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Validate password using bcrypt directly
-    const isValidPassword = await this.validatePassword(
-      loginDto.password,
-      user.password,
-    );
-
-    if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Check if user is active
-    if (!user.isActive) {
-      throw new UnauthorizedException('Account is deactivated');
-    }
-
-    // Generate JWT token
-    const token = this.generateToken(user);
-
-    // Convert to response DTO
-    return {
-      user: toUserResponseDto(user),
-      token,
-    };
-  }
 
   // Find all users
   async findAll(): Promise<UserResponseDto[]> {
@@ -136,37 +72,4 @@ export class UsersService {
     }
   }
 
-  // Generate JWT token
-  private generateToken(user: User): string {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      roles: user.roles,
-    };
-
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('config.jwt.secret'),
-      expiresIn: this.configService.get<string>('config.jwt.expiresIn'),
-    });
-  }
-
-  // Helper method to validate password
-  private async validatePassword(
-    plainPassword: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    const bcrypt = await import('bcryptjs');
-    return bcrypt.compare(plainPassword, hashedPassword);
-  }
-
-  // Validate Jwt token
-  async validateToken(token: string): Promise<any> {
-    try {
-      return this.jwtService.verify(token, {
-        secret: this.configService.get<string>('jwt.secret'),
-      });
-    } catch (error) {
-      throw new UnauthorizedException('Invalid token');
-    }
-  }
 }

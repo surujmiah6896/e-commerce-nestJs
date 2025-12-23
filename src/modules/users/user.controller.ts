@@ -1,37 +1,14 @@
-import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { Public } from "src/common/decorators/public.decorator";
-import { LoginDto } from "./dto/login.dto";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { GetUser } from "src/common/decorators/get-user.decorator";
 import { UpdateUserDto } from "./dto/update-user.dto";
 
-// @ApiTags('users')
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UsersService) {}
-
-  @Public()
-  @Post('register')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully registered' })
-  @ApiResponse({ status: 409, description: 'Email already exists' })
-  async register(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Public()
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login user' })
-  @ApiResponse({ status: 200, description: 'Login successful' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.userService.login(loginDto);
-  }
 
   @Get()
   @Roles('admin')
@@ -94,6 +71,4 @@ export class UserController {
   async remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }
-
-  
 }
