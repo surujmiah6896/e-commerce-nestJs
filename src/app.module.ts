@@ -16,6 +16,8 @@ import { UsersModule } from './modules/users/users.module';
 // import { CategoriesModule } from './modules/categories/categories.module';
 // import { OrdersModule } from './modules/orders/orders.module';
 // import { HealthModule } from './modules/health/health.module';
+import { CategoryModule } from './modules/category/category.module';
+import { GlobalModule } from './shared/global/global.module';
 
 @Module({
   imports: [
@@ -85,9 +87,11 @@ import { UsersModule } from './modules/users/users.module';
       inject: [ConfigService],
     }),
 
-    AuthModule, 
+    AuthModule,
 
     UsersModule,
+    CategoryModule,
+    GlobalModule,
 
     // 6. Your Feature Modules
     // HealthModule,
