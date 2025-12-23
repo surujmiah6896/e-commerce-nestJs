@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { RedisModule } from './modules/redis/redis.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 // Import your feature modules
 // import { UsersModule } from './modules/users/users.module';
@@ -82,6 +84,10 @@ import { RedisModule } from './modules/redis/redis.module';
       }),
       inject: [ConfigService],
     }),
+
+    AuthModule, 
+
+    UsersModule,
 
     // 6. Your Feature Modules
     // HealthModule,
