@@ -70,6 +70,11 @@ export class UsersService {
         return { user: userWithoutPassword, token };
     }
 
+    // Find all users
+    async findAll(): Promise<Omit<User, 'password'>[]> {
+        const users = await this.userRepository.find();
+        return users.map(({ password, ...user }) => user);
+    }
 
     // Generate JWT token
     private generateToken(user: User): string {
