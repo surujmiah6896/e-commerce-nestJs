@@ -143,3 +143,6 @@ export class CreateCategoryDto {
     @IsString()
     metaContent?: string;
 }
+
+
+export class UpdateCategoryDto extends CreateCategoryDto{}
