@@ -29,6 +29,7 @@ export class SubCategoryController {
     status: 200,
     description: 'sub-categories retrieved successfully',
   })
+  @ResponseMessage('🎉 SubCategory get all successfully!')
   async getAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -99,7 +100,7 @@ export class SubCategoryController {
   }
 
   @Public()
-  @Delete('delete')
+  @Delete()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new sub-category' })
   @ApiResponse({ status: 201, description: 'SubCategory successfully created' })
