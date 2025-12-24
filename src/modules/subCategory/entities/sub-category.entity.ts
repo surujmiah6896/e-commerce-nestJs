@@ -27,9 +27,6 @@ export class SubCategory {
   name: string;
 
   @Column({ unique: true })
-  fname: string;
-
-  @Column({ unique: true })
   slug: string;
 
   @Column({ nullable: true })

@@ -6,13 +6,13 @@ import { SubCategoryService } from './sub-category.service';
 import { DeleteSubCategoryDto } from './dto/delete-sub-category.dto';
 import { CreateSubCategoryDto, UpdateSubCategoryDto } from './dto/create-sub-category.dto';
 
-@ApiTags('subCategory')
+@ApiTags('subcategory')
 @Controller('subcategory')
 export class SubCategoryController {
   constructor(private readonly subCategoryService: SubCategoryService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all categories with filters' })
+  @ApiOperation({ summary: 'Get all sub-categories with filters' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'search', required: false, type: String })
@@ -27,7 +27,7 @@ export class SubCategoryController {
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'] })
   @ApiResponse({
     status: 200,
-    description: 'Categories retrieved successfully',
+    description: 'sub-categories retrieved successfully',
   })
   async getAll(
     @Query('page') page: number = 1,
@@ -52,7 +52,7 @@ export class SubCategoryController {
   @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new Category' })
+  @ApiOperation({ summary: 'Create a new sub-category' })
   @ApiResponse({ status: 201, description: 'SubCategory successfully created' })
   @ApiResponse({ status: 409, description: 'SubCategory already exists' })
   @ResponseMessage('🎉 SubCategory created successfully!')
@@ -63,7 +63,7 @@ export class SubCategoryController {
   @Public()
   @Get(':id')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Show a Category' })
+  @ApiOperation({ summary: 'Show a sub-category' })
   @ApiResponse({ status: 201, description: 'SubCategory successfully Show' })
   @ResponseMessage('🎉 Get SubCategory successfully!')
   async show(@Param('id') id: string) {
@@ -73,7 +73,7 @@ export class SubCategoryController {
   @Public()
   @Patch(':id')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Update a Category' })
+  @ApiOperation({ summary: 'Update a sub-category' })
   @ApiResponse({ status: 201, description: 'SubCategory successfully update' })
   @ApiResponse({ status: 409, description: 'SubCategory already exists' })
   @ResponseMessage('🎉 SubCategory update successfully!')
@@ -87,7 +87,7 @@ export class SubCategoryController {
   @Public()
   @Post('status/:id')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Update Status a Category' })
+  @ApiOperation({ summary: 'Update Status a sub-category' })
   @ApiResponse({
     status: 201,
     description: 'SubCategory successfully Update Status',
@@ -101,7 +101,7 @@ export class SubCategoryController {
   @Public()
   @Delete('delete')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new Category' })
+  @ApiOperation({ summary: 'Create a new sub-category' })
   @ApiResponse({ status: 201, description: 'SubCategory successfully created' })
   @ApiResponse({ status: 409, description: 'SubCategory already exists' })
   @ResponseMessage('🎉 SubCategory Delete successfully!')

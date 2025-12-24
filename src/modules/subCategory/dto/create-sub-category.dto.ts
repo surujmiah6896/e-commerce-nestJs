@@ -28,10 +28,10 @@ export class CreateSubCategoryDto {
   name: string;
 
   @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'Parent Category ID (UUID)',
+    example: '1',
+    description: 'Parent Category ID',
   })
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   categoryId: string;
 

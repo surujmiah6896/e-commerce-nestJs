@@ -5,16 +5,19 @@ import { HelperService } from 'src/shared/global/helper.service';
 import { SubCategory } from './entities/sub-category.entity';
 import { CreateSubCategoryDto, UpdateSubCategoryDto } from './dto/create-sub-category.dto';
 import { DeleteSubCategoryDto } from './dto/delete-sub-category.dto';
+import { Category } from '../category/entities/category.entity';
 
 @Injectable()
 export class SubCategoryService {
   constructor(
     @InjectRepository(SubCategory)
     private readonly subCategoryRepository: Repository<SubCategory>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private readonly helperService: HelperService,
   ) {}
 
-  // Create new category
+  // Create new sub-category
   async create(
     createSubCategoryDto: CreateSubCategoryDto,
   ): Promise<SubCategory> {
@@ -23,18 +26,32 @@ export class SubCategoryService {
       where: { slug: slug },
     });
 
+    const category = await this.categoryRepository.findOne({
+      where: { id: createSubCategoryDto.categoryId },
+    });
+
     if (existingBySlug) {
       throw new ConflictException(
-        `Category with name "${createSubCategoryDto.name}" already exists`,
+        `SubCategory with name "${createSubCategoryDto.name}" already exists`,
       );
     }
 
-    const category = this.subCategoryRepository.create({
-      ...createSubCategoryDto,
-      slug,
-    });
+    if (!category) {
+      throw new NotFoundException(
+        `Category is "${createSubCategoryDto.categoryId}" Not Found`,
+      );
+    }
 
-    return await this.subCategoryRepository.save(category);
+  const subcategoryData = {
+    ...createSubCategoryDto,
+    slug,
+    category,
+    categoryId: createSubCategoryDto.categoryId,
+  };
+
+    const subcategory = this.subCategoryRepository.create(subcategoryData);
+
+    return await this.subCategoryRepository.save(subcategory);
   }
 
   //get all category
@@ -166,7 +183,7 @@ export class SubCategoryService {
     category.isActive = !category.isActive;
     return await this.subCategoryRepository.save(category);
   }
- 
+
   //update category
   async update(
     id: string,
@@ -207,7 +224,9 @@ export class SubCategoryService {
   }
 
   //delete category
-  async delete(deleteSubCategoryDto: DeleteSubCategoryDto): Promise<SubCategory> {
+  async delete(
+    deleteSubCategoryDto: DeleteSubCategoryDto,
+  ): Promise<SubCategory> {
     const { id, force } = deleteSubCategoryDto;
     const category = await this.subCategoryRepository.findOne({
       where: { id },

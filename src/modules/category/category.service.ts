@@ -29,7 +29,7 @@ export class CategoryService {
 
     const category = this.categoryRepository.create({
       ...createCategoryDto,
-      slug,
+      slug
     });
 
     return await this.categoryRepository.save(category);
@@ -141,7 +141,34 @@ export class CategoryService {
 
   //show category
   async show(id: string): Promise<Category> {
-    const category = await this.categoryRepository.findOne({ where: { id } });
+    const category = await this.categoryRepository.findOne({
+      where: {
+        id,
+        subCategories: {
+          isActive: true, // Only active subcategories
+        },
+      },
+      relations: ['subCategories'],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        isActive: true,
+        subCategories: {
+          id: true,
+          name: true,
+          slug: true,
+          position: true,
+          isActive: true,
+        },
+      },
+      order: {
+        subCategories: {
+          position: 'ASC',
+        },
+      },
+    });
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
