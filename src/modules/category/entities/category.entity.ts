@@ -34,7 +34,7 @@ export class Category {
   @Column({ nullable: true })
   image: string;
 
-  @Column({ default: 0 })
+  @Column({ default: true })
   isActive: boolean;
 
   @Column({ nullable: true })

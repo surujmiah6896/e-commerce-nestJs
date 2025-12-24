@@ -40,17 +40,18 @@ export class CategoryController {
     @Query('sortBy') sortBy: string = 'position',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
   ) {
-    return this.categoryService.getAll(
+    return this.categoryService
+      .getAll
       // page,
       // limit,
       // { search, isActive, parentId, position },
       // sortBy,
       // sortOrder,
-    );
+      ();
   }
 
   @Public()
-  @Post('create')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new Category' })
   @ApiResponse({ status: 201, description: 'Category successfully created' })
@@ -82,6 +83,19 @@ export class CategoryController {
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
     return this.categoryService.update(id, updateCategoryDto);
+  }
+
+  @Public()
+  @Post('status/:id')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create a new Category' })
+  @ApiResponse({ status: 201, description: 'Category successfully created' })
+  @ApiResponse({ status: 409, description: 'Category already exists' })
+  @ResponseMessage('🎉 Category update successfully!')
+  async status(
+    @Param('id') id: string,
+  ) {
+    return this.categoryService.status(id);
   }
 
   @Public()
