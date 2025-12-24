@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpCode, HttpStatus, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
 import { CategoryService } from './category.service';
@@ -21,6 +21,16 @@ export class CategoryController {
   @ResponseMessage('🎉 Category created successfully!')
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
+  }
+
+  @Public()
+  @Get(':id')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Show a Category' })
+  @ApiResponse({ status: 201, description: 'Category successfully Show' })
+  @ResponseMessage('🎉 Get Category successfully!')
+  async show(@Param('id') id: string) {
+    return this.categoryService.show(id);
   }
 
   @Public()

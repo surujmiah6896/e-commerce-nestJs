@@ -35,6 +35,15 @@ export class CategoryService {
     return await this.categoryRepository.save(category);
   }
 
+  //show category
+  async show(id: string): Promise<Category>{
+    const category = await this.categoryRepository.findOne({where:{id}})
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+    return category;
+  }
+
   //update category
   async update(
     id: string,
@@ -71,7 +80,8 @@ export class CategoryService {
     return await this.categoryRepository.save(category);
   }
 
-  async delete(deleteCategoryDto: DeleteCategoryDto) {
+  //delete category
+  async delete(deleteCategoryDto: DeleteCategoryDto): Promise<Category> {
     const { id, force } = deleteCategoryDto;
     const category = await this.categoryRepository.findOne({
       where: { id },
@@ -89,6 +99,4 @@ export class CategoryService {
 
     return category;
   }
-
-  
 }
