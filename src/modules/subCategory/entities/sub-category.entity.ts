@@ -1,4 +1,5 @@
 
+import { Product } from '../../product/entities/product.entity';
 import { Category } from '../../category/entities/category.entity';
 import {
   Entity,
@@ -9,6 +10,7 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 
@@ -22,6 +24,9 @@ export class SubCategory {
   })
   @JoinColumn({ name: 'category_id' })
   category: Category;
+
+  @OneToMany(() => Product, (product) => product.subCategory)
+  products: Product[];
 
   @Column({ unique: true })
   name: string;

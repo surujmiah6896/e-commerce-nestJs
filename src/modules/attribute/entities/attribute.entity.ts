@@ -1,3 +1,4 @@
+import { Product } from '../../product/entities/product.entity';
 import { Variant } from '../../variant/entities/variant.entity';
 import {
   Entity,
@@ -6,7 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany
+  OneToMany,
+  ManyToMany
 } from 'typeorm';
 
 
@@ -39,6 +41,9 @@ export class Attribute {
     onDelete: 'CASCADE',
   })
   variants: Variant[];
+
+  @ManyToMany(() => Product, (product) => product.attributes)
+  products: Product[];
 
   @CreateDateColumn()
   createdAt: Date;

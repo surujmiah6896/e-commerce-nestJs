@@ -1,3 +1,4 @@
+import { Product } from '../../product/entities/product.entity';
 import { SubCategory } from '../../subCategory/entities/sub-category.entity';
 import {
   Entity,
@@ -53,10 +54,13 @@ export class Category {
 
   // Relation to subcategories (if using separate table)
   @OneToMany(() => SubCategory, (subCategory) => subCategory.category, {
-    cascade: true, 
-    onDelete: 'CASCADE', 
+    cascade: true,
+    onDelete: 'CASCADE',
   })
   subCategories: SubCategory[];
+
+  @OneToMany(() => Product, (product) => product.subCategory)
+  products: Product[];
 
   @CreateDateColumn()
   createdAt: Date;

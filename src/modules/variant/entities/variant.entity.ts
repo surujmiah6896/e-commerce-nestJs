@@ -1,3 +1,4 @@
+import { Product } from 'src/modules/product/entities/product.entity';
 import { Attribute } from '../../attribute/entities/attribute.entity';
 import {
   Entity,
@@ -25,6 +26,12 @@ export class Variant {
   @Column({ unique: true })
   name: string;
 
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
+
+  @Column({ nullable: true })
+  sku: string;
+
   @Column({ nullable: true })
   description: string;
 
@@ -39,6 +46,10 @@ export class Variant {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @ManyToOne(() => Product, (product) => product.variants)
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
 
   @CreateDateColumn()
   createdAt: Date;
