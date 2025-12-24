@@ -1,15 +1,15 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
-import { CategoryService } from './category.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/create-category.dto';
+import { BrandService } from './brand.service';
+import { CreateBrandDto, UpdateBrandDto } from './dto/create-brand.dto';
 import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
-import { DeleteCategoryDto } from './dto/delete-category.dto';
+import { DeleteBrandDto } from './dto/delete-brand.dto';
 
-@ApiTags('category')
-@Controller('category')
-export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+@ApiTags('Brand')
+@Controller('Brand')
+export class BrandController {
+  constructor(private readonly brandService: BrandService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all categories with filters' })
@@ -39,7 +39,7 @@ export class CategoryController {
     @Query('sortBy') sortBy: string = 'position',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
   ) {
-    return this.categoryService
+    return this.brandService
       .getAll
       // page,
       // limit,
@@ -52,60 +52,61 @@ export class CategoryController {
   @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully created' })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category created successfully!')
-  async create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  @ApiOperation({ summary: 'Create a new Brand' })
+  @ApiResponse({ status: 201, description: 'Brand successfully created' })
+  @ApiResponse({ status: 409, description: 'Brand already exists' })
+  @ResponseMessage('🎉 Brand created successfully!')
+  async create(@Body() createBrandDto: CreateBrandDto) {
+    return this.brandService.create(createBrandDto);
   }
 
+  
   @Public()
   @Get(':id')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Show a Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully Show' })
-  @ResponseMessage('🎉 Get Category successfully!')
+  @ApiOperation({ summary: 'Show a Brand' })
+  @ApiResponse({ status: 201, description: 'Brand successfully Show' })
+  @ResponseMessage('🎉 Get Brand successfully!')
   async show(@Param('id') id: string) {
-    return this.categoryService.show(id);
+    return this.brandService.show(id);
   }
 
   @Public()
   @Patch(':id')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Update a Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully update' })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category update successfully!')
+  @ApiOperation({ summary: 'Update a Brand' })
+  @ApiResponse({ status: 201, description: 'Brand successfully update' })
+  @ApiResponse({ status: 409, description: 'Brand already exists' })
+  @ResponseMessage('🎉 Brand update successfully!')
   async update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
+    @Body() updateBrandDto: UpdateBrandDto,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.brandService.update(id, updateBrandDto);
   }
 
   @Public()
   @Post('status/:id')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Update Status a Category' })
+  @ApiOperation({ summary: 'Update Status a Brand' })
   @ApiResponse({
     status: 201,
-    description: 'Category successfully Update Status',
+    description: 'Brand successfully Update Status',
   })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category status update successfully!')
+  @ApiResponse({ status: 409, description: 'Brand already exists' })
+  @ResponseMessage('🎉 Brand status update successfully!')
   async status(@Param('id') id: string) {
-    return this.categoryService.status(id);
+    return this.brandService.status(id);
   }
 
   @Public()
   @Delete('delete')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully created' })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category Delete successfully!')
-  async delete(@Body() deleteCategoryDto: DeleteCategoryDto) {
-    return this.categoryService.delete(deleteCategoryDto);
+  @ApiOperation({ summary: 'Create a new Brand' })
+  @ApiResponse({ status: 201, description: 'Brand successfully created' })
+  @ApiResponse({ status: 409, description: 'Brand already exists' })
+  @ResponseMessage('🎉 Brand Delete successfully!')
+  async delete(@Body() deleteBrandDto: DeleteBrandDto) {
+    return this.brandService.delete(deleteBrandDto);
   }
 }

@@ -1,41 +1,39 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Category } from './entities/category.entity';
+import { Brand } from './entities/brand.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { HelperService } from 'src/shared/global/helper.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/create-category.dto';
-import { DeleteCategoryDto } from './dto/delete-category.dto';
+import { CreateBrandDto, UpdateBrandDto } from './dto/create-brand.dto';
+import { DeleteBrandDto } from './dto/delete-brand.dto';
 
 @Injectable()
-export class CategoryService {
+export class BrandService {
   constructor(
-    @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Brand)
+    private readonly BrandRepository: Repository<Brand>,
     private readonly helperService: HelperService,
   ) {}
 
-  // Create new category
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    const slug = this.helperService.generateSlug(createCategoryDto.name);
-    const existingBySlug = await this.categoryRepository.findOne({
-      where: { slug: slug },
+  // Create new Brand
+  async create(createBrandDto: CreateBrandDto): Promise<Brand> {
+    const existingByName = await this.BrandRepository.findOne({
+      where: { name: createBrandDto.name },
     });
 
-    if (existingBySlug) {
+    if (existingByName) {
       throw new ConflictException(
-        `Category with name "${createCategoryDto.name}" already exists`,
+        `Brand with name "${createBrandDto.name}" already exists`,
       );
     }
 
-    const category = this.categoryRepository.create({
-      ...createCategoryDto,
-      slug
+    const Brand = this.BrandRepository.create({
+      ...createBrandDto
     });
 
-    return await this.categoryRepository.save(category);
+    return await this.BrandRepository.save(Brand);
   }
 
-  //get all category
+  //get all Brand
   async getAll(
     page: number = 1,
     limit: number = 10,
@@ -48,7 +46,7 @@ export class CategoryService {
       positionMin?: number;
       positionMax?: number;
     },
-  ): Promise<{ data: Category[]; meta: any }> {
+  ): Promise<{ data: Brand[]; meta: any }> {
     const skip = (page - 1) * limit;
 
     // Build where conditions
@@ -94,7 +92,7 @@ export class CategoryService {
     }
 
     // Build query with caching
-    const queryBuilder = this.categoryRepository.createQueryBuilder('category');
+    const queryBuilder = this.BrandRepository.createQueryBuilder('Brand');
 
     // Apply where conditions
     if (Object.keys(whereConditions).length > 0) {
@@ -104,14 +102,14 @@ export class CategoryService {
     // Search filter (uses LIKE for partial match)
     if (filters?.search) {
       queryBuilder.andWhere(
-        '(category.name LIKE :search OR category.description LIKE :search OR category.slug LIKE :search)',
+        '(Brand.name LIKE :search OR Brand.description LIKE :search OR Brand.slug LIKE :search)',
         { search: `%${filters.search}%` },
       );
     }
 
     // Ordering
-    queryBuilder.orderBy('category.position', 'ASC');
-    queryBuilder.addOrderBy('category.name', 'ASC');
+    queryBuilder.orderBy('Brand.position', 'ASC');
+    queryBuilder.addOrderBy('Brand.name', 'ASC');
 
     // Pagination
     queryBuilder.skip(skip).take(limit);
@@ -139,109 +137,75 @@ export class CategoryService {
     };
   }
 
-  //show category
-  async show(id: string): Promise<Category> {
-    const category = await this.categoryRepository.findOne({
-      where: {
-        id,
-        subCategories: {
-          isActive: true, // Only active subcategories
-        },
-      },
-      relations: ['subCategories'],
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        isActive: true,
-        subCategories: {
-          id: true,
-          name: true,
-          slug: true,
-          position: true,
-          isActive: true,
-        },
-      },
-      order: {
-        subCategories: {
-          position: 'ASC',
-        },
-      },
+  //show Brand
+  async show(id: string): Promise<Brand> {
+    const brand = await this.BrandRepository.findOne({
+      where: {id}
     });
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+
+    if (!brand) {
+      throw new NotFoundException(`Brand with ID ${id} not found`);
     }
-    return category;
+    return brand;
   }
 
-  //status category
-  async status(id: string): Promise<Category> {
-    const category = await this.categoryRepository.findOne({
+  //status Brand
+  async status(id: string): Promise<Brand> {
+    const brand = await this.BrandRepository.findOne({
       where: { id },
     });
 
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+    if (!brand) {
+      throw new NotFoundException(`Brand with ID ${id} not found`);
     }
 
-    category.isActive = !category.isActive;
-    return await this.categoryRepository.save(category);
+    brand.isActive = !brand.isActive;
+    return await this.BrandRepository.save(brand);
   }
 
-  //update category
+  //update Brand
   async update(
     id: string,
-    updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
-    const category = await this.categoryRepository.findOne({ where: { id } });
+    updateBrandDto: UpdateBrandDto,
+  ): Promise<Brand> {
+    const brand = await this.BrandRepository.findOne({ where: { id } });
 
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+    if (!brand) {
+      throw new NotFoundException(`Brand with ID ${id} not found`);
     }
 
-    const slug = this.helperService.generateSlug(updateCategoryDto.name);
-    const existingBySlug = await this.categoryRepository.findOne({
+    const slug = this.helperService.generateSlug(updateBrandDto.name);
+    const existingBySlug = await this.BrandRepository.findOne({
       where: { name: slug },
     });
 
     if (existingBySlug && existingBySlug.id !== id) {
       throw new ConflictException(
-        `Category with name "${updateCategoryDto.name}" already exists`,
+        `Brand with name "${updateBrandDto.name}" already exists`,
       );
     }
 
-    if (
-      !updateCategoryDto.slug &&
-      (!updateCategoryDto.name || updateCategoryDto.name === category.name)
-    ) {
-      updateCategoryDto.slug = category.slug;
-    } else {
-      updateCategoryDto.slug = slug;
-    }
+    Object.assign(brand, updateBrandDto);
 
-    Object.assign(category, updateCategoryDto);
-
-    return await this.categoryRepository.save(category);
+    return await this.BrandRepository.save(brand);
   }
 
-  //delete category
-  async delete(deleteCategoryDto: DeleteCategoryDto): Promise<Category> {
-    const { id, force } = deleteCategoryDto;
-    const category = await this.categoryRepository.findOne({
+  //delete Brand
+  async delete(deleteBrandDto: DeleteBrandDto): Promise<Brand> {
+    const { id, force } = deleteBrandDto;
+    const brand = await this.BrandRepository.findOne({
       where: { id },
     });
 
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+    if (!brand) {
+      throw new NotFoundException(`Brand with ID ${id} not found`);
     }
 
     if (force) {
-      await this.categoryRepository.delete(id);
+      await this.BrandRepository.delete(id);
     } else {
-      await this.categoryRepository.softDelete(id);
+      await this.BrandRepository.softDelete(id);
     }
-
-    return category;
+    return brand;
   }
 }
