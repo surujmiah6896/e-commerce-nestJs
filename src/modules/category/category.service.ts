@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HelperService } from 'src/shared/global/helper.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/create-category.dto';
+import { DeleteCategoryDto } from './dto/delete-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -38,7 +39,7 @@ export class CategoryService {
   async update(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
-  ) {
+  ): Promise<Category> {
     const category = await this.categoryRepository.findOne({ where: { id } });
 
     if (!category) {
@@ -61,12 +62,33 @@ export class CategoryService {
       (!updateCategoryDto.name || updateCategoryDto.name === category.name)
     ) {
       updateCategoryDto.slug = category.slug;
-    }else{
-        updateCategoryDto.slug = slug;
+    } else {
+      updateCategoryDto.slug = slug;
     }
 
     Object.assign(category, updateCategoryDto);
 
     return await this.categoryRepository.save(category);
   }
+
+  async delete(deleteCategoryDto: DeleteCategoryDto) {
+    const { id, force } = deleteCategoryDto;
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    if (force) {
+      await this.categoryRepository.delete(id);
+    } else {
+      await this.categoryRepository.softDelete(id);
+    }
+
+    return category;
+  }
+
+  
 }
