@@ -19,6 +19,7 @@ import { UsersModule } from './modules/users/users.module';
 import { CategoryModule } from './modules/category/category.module';
 import { GlobalModule } from './shared/global/global.module';
 import { SubCategoryModule } from './modules/subCategory/sub-category.module';
+import { BrandModule } from './modules/brand/brand.module';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { SubCategoryModule } from './modules/subCategory/sub-category.module';
         ),
         synchronize: configService.get<boolean>(
           'config.database.synchronize',
-          true,
+          false,
         ),
         autoLoadEntities: true,
         logging: configService.get<boolean>('config.database.logging', false),
@@ -95,6 +96,7 @@ import { SubCategoryModule } from './modules/subCategory/sub-category.module';
     CategoryModule,
     SubCategoryModule,
     GlobalModule,
+    BrandModule,
 
     // 6. Your Feature Modules
     // HealthModule,

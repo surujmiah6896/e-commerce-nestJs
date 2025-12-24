@@ -6,8 +6,8 @@ import { CreateBrandDto, UpdateBrandDto } from './dto/create-brand.dto';
 import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
 import { DeleteBrandDto } from './dto/delete-brand.dto';
 
-@ApiTags('Brand')
-@Controller('Brand')
+@ApiTags('brand')
+@Controller('brand')
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
@@ -60,7 +60,7 @@ export class BrandController {
     return this.brandService.create(createBrandDto);
   }
 
-  
+
   @Public()
   @Get(':id')
   @HttpCode(HttpStatus.CREATED)
