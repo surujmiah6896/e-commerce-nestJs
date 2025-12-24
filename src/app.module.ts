@@ -22,6 +22,7 @@ import { SubCategoryModule } from './modules/subCategory/sub-category.module';
 import { BrandModule } from './modules/brand/brand.module';
 import { AttributeModule } from './modules/attribute/attribute.module';
 import { VariantModule } from './modules/variant/variant.module';
+import { SupplierModule } from './modules/supplier/supplier.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { VariantModule } from './modules/variant/variant.module';
     BrandModule,
     AttributeModule,
     VariantModule,
+    SupplierModule,
 
     // 6. Your Feature Modules
     // HealthModule,
