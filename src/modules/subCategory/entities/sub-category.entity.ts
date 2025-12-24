@@ -1,4 +1,5 @@
-import { Category } from 'src/modules/category/entities/category.entity';
+
+import { Category } from '../../category/entities/category.entity';
 import {
   Entity,
   Column,
@@ -24,6 +25,9 @@ export class SubCategory {
 
   @Column({ unique: true })
   name: string;
+
+  @Column({ unique: true })
+  fname: string;
 
   @Column({ unique: true })
   slug: string;

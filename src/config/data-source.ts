@@ -15,10 +15,10 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DB_NAME || 'ecommerce_db',
 
   // Fix these paths - they need to be absolute
-  entities: [join(__dirname, '../**/*.entity{.ts,.js}')],
+  entities: [join(__dirname, '../modules/**/*.entity{.ts,.js}')],
   migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
   migrationsTableName: 'migrations',
-  synchronize: false,
+  synchronize: process.env.DB_SYNCHRONIZE === 'true',
   logging: process.env.DB_LOGGING === 'true',
 };
 

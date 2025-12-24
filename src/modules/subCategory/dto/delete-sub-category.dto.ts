@@ -6,7 +6,7 @@ import {
     IsBoolean,
 } from 'class-validator';
 
-export class DeleteCategoryDto {
+export class DeleteSubCategoryDto {
   @ApiProperty({ description: 'Category ID' })
   @IsString()
   @IsNotEmpty()

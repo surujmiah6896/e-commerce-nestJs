@@ -18,6 +18,7 @@ import { UsersModule } from './modules/users/users.module';
 // import { HealthModule } from './modules/health/health.module';
 import { CategoryModule } from './modules/category/category.module';
 import { GlobalModule } from './shared/global/global.module';
+import { SubCategoryModule } from './modules/subCategory/sub-category.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { GlobalModule } from './shared/global/global.module';
           'config.database.synchronize',
           true,
         ),
+        autoLoadEntities: true,
         logging: configService.get<boolean>('config.database.logging', false),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/../migrations/*{.ts,.js}'],
@@ -91,6 +93,7 @@ import { GlobalModule } from './shared/global/global.module';
 
     UsersModule,
     CategoryModule,
+    SubCategoryModule,
     GlobalModule,
 
     // 6. Your Feature Modules

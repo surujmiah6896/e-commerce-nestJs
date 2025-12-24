@@ -1,38 +1,40 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { HelperService } from 'src/shared/global/helper.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/create-category.dto';
-import { DeleteCategoryDto } from './dto/delete-category.dto';
+import { SubCategory } from './entities/sub-category.entity';
+import { CreateSubCategoryDto, UpdateSubCategoryDto } from './dto/create-sub-category.dto';
+import { DeleteSubCategoryDto } from './dto/delete-sub-category.dto';
 
 @Injectable()
-export class CategoryService {
+export class SubCategoryService {
   constructor(
-    @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(SubCategory)
+    private readonly subCategoryRepository: Repository<SubCategory>,
     private readonly helperService: HelperService,
   ) {}
 
   // Create new category
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    const slug = this.helperService.generateSlug(createCategoryDto.name);
-    const existingBySlug = await this.categoryRepository.findOne({
+  async create(
+    createSubCategoryDto: CreateSubCategoryDto,
+  ): Promise<SubCategory> {
+    const slug = this.helperService.generateSlug(createSubCategoryDto.name);
+    const existingBySlug = await this.subCategoryRepository.findOne({
       where: { slug: slug },
     });
 
     if (existingBySlug) {
       throw new ConflictException(
-        `Category with name "${createCategoryDto.name}" already exists`,
+        `Category with name "${createSubCategoryDto.name}" already exists`,
       );
     }
 
-    const category = this.categoryRepository.create({
-      ...createCategoryDto,
+    const category = this.subCategoryRepository.create({
+      ...createSubCategoryDto,
       slug,
     });
 
-    return await this.categoryRepository.save(category);
+    return await this.subCategoryRepository.save(category);
   }
 
   //get all category
@@ -48,7 +50,7 @@ export class CategoryService {
       positionMin?: number;
       positionMax?: number;
     },
-  ): Promise<{ data: Category[]; meta: any }> {
+  ): Promise<{ data: SubCategory[]; meta: any }> {
     const skip = (page - 1) * limit;
 
     // Build where conditions
@@ -94,7 +96,8 @@ export class CategoryService {
     }
 
     // Build query with caching
-    const queryBuilder = this.categoryRepository.createQueryBuilder('category');
+    const queryBuilder =
+      this.subCategoryRepository.createQueryBuilder('category');
 
     // Apply where conditions
     if (Object.keys(whereConditions).length > 0) {
@@ -140,8 +143,10 @@ export class CategoryService {
   }
 
   //show category
-  async show(id: string): Promise<Category> {
-    const category = await this.categoryRepository.findOne({ where: { id } });
+  async show(id: string): Promise<SubCategory> {
+    const category = await this.subCategoryRepository.findOne({
+      where: { id },
+    });
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
@@ -149,8 +154,8 @@ export class CategoryService {
   }
 
   //status category
-  async status(id: string): Promise<Category> {
-    const category = await this.categoryRepository.findOne({
+  async status(id: string): Promise<SubCategory> {
+    const category = await this.subCategoryRepository.findOne({
       where: { id },
     });
 
@@ -159,49 +164,52 @@ export class CategoryService {
     }
 
     category.isActive = !category.isActive;
-    return await this.categoryRepository.save(category);
+    return await this.subCategoryRepository.save(category);
   }
-
+ 
   //update category
   async update(
     id: string,
-    updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
-    const category = await this.categoryRepository.findOne({ where: { id } });
+    updateSubCategoryDto: UpdateSubCategoryDto,
+  ): Promise<SubCategory> {
+    const category = await this.subCategoryRepository.findOne({
+      where: { id },
+    });
 
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
-    const slug = this.helperService.generateSlug(updateCategoryDto.name);
-    const existingBySlug = await this.categoryRepository.findOne({
+    const slug = this.helperService.generateSlug(updateSubCategoryDto.name);
+    const existingBySlug = await this.subCategoryRepository.findOne({
       where: { name: slug },
     });
 
     if (existingBySlug && existingBySlug.id !== id) {
       throw new ConflictException(
-        `Category with name "${updateCategoryDto.name}" already exists`,
+        `Category with name "${updateSubCategoryDto.name}" already exists`,
       );
     }
 
     if (
-      !updateCategoryDto.slug &&
-      (!updateCategoryDto.name || updateCategoryDto.name === category.name)
+      !updateSubCategoryDto.slug &&
+      (!updateSubCategoryDto.name ||
+        updateSubCategoryDto.name === category.name)
     ) {
-      updateCategoryDto.slug = category.slug;
+      updateSubCategoryDto.slug = category.slug;
     } else {
-      updateCategoryDto.slug = slug;
+      updateSubCategoryDto.slug = slug;
     }
 
-    Object.assign(category, updateCategoryDto);
+    Object.assign(category, updateSubCategoryDto);
 
-    return await this.categoryRepository.save(category);
+    return await this.subCategoryRepository.save(category);
   }
 
   //delete category
-  async delete(deleteCategoryDto: DeleteCategoryDto): Promise<Category> {
-    const { id, force } = deleteCategoryDto;
-    const category = await this.categoryRepository.findOne({
+  async delete(deleteSubCategoryDto: DeleteSubCategoryDto): Promise<SubCategory> {
+    const { id, force } = deleteSubCategoryDto;
+    const category = await this.subCategoryRepository.findOne({
       where: { id },
     });
 
@@ -210,11 +218,10 @@ export class CategoryService {
     }
 
     if (force) {
-      await this.categoryRepository.delete(id);
+      await this.subCategoryRepository.delete(id);
     } else {
-      await this.categoryRepository.softDelete(id);
+      await this.subCategoryRepository.softDelete(id);
     }
-
     return category;
   }
 }

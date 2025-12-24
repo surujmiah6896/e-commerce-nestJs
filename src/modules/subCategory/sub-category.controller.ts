@@ -1,15 +1,15 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
-import { CategoryService } from './category.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/create-category.dto';
 import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
-import { DeleteCategoryDto } from './dto/delete-category.dto';
+import { SubCategoryService } from './sub-category.service';
+import { DeleteSubCategoryDto } from './dto/delete-sub-category.dto';
+import { CreateSubCategoryDto, UpdateSubCategoryDto } from './dto/create-sub-category.dto';
 
-@ApiTags('category')
-@Controller('category')
-export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+@ApiTags('subCategory')
+@Controller('subcategory')
+export class SubCategoryController {
+  constructor(private readonly subCategoryService: SubCategoryService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all categories with filters' })
@@ -39,7 +39,7 @@ export class CategoryController {
     @Query('sortBy') sortBy: string = 'position',
     @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
   ) {
-    return this.categoryService
+    return this.subCategoryService
       .getAll
       // page,
       // limit,
@@ -53,35 +53,35 @@ export class CategoryController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully created' })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category created successfully!')
-  async create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  @ApiResponse({ status: 201, description: 'SubCategory successfully created' })
+  @ApiResponse({ status: 409, description: 'SubCategory already exists' })
+  @ResponseMessage('🎉 SubCategory created successfully!')
+  async create(@Body() createSubCategoryDto: CreateSubCategoryDto) {
+    return this.subCategoryService.create(createSubCategoryDto);
   }
 
   @Public()
   @Get(':id')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Show a Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully Show' })
-  @ResponseMessage('🎉 Get Category successfully!')
+  @ApiResponse({ status: 201, description: 'SubCategory successfully Show' })
+  @ResponseMessage('🎉 Get SubCategory successfully!')
   async show(@Param('id') id: string) {
-    return this.categoryService.show(id);
+    return this.subCategoryService.show(id);
   }
 
   @Public()
   @Patch(':id')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Update a Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully update' })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category update successfully!')
+  @ApiResponse({ status: 201, description: 'SubCategory successfully update' })
+  @ApiResponse({ status: 409, description: 'SubCategory already exists' })
+  @ResponseMessage('🎉 SubCategory update successfully!')
   async update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
+    @Body() updateSubCategoryDto: UpdateSubCategoryDto,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.subCategoryService.update(id, updateSubCategoryDto);
   }
 
   @Public()
@@ -90,22 +90,22 @@ export class CategoryController {
   @ApiOperation({ summary: 'Update Status a Category' })
   @ApiResponse({
     status: 201,
-    description: 'Category successfully Update Status',
+    description: 'SubCategory successfully Update Status',
   })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category status update successfully!')
+  @ApiResponse({ status: 409, description: 'SubCategory already exists' })
+  @ResponseMessage('🎉 SubCategory status update successfully!')
   async status(@Param('id') id: string) {
-    return this.categoryService.status(id);
+    return this.subCategoryService.status(id);
   }
 
   @Public()
   @Delete('delete')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new Category' })
-  @ApiResponse({ status: 201, description: 'Category successfully created' })
-  @ApiResponse({ status: 409, description: 'Category already exists' })
-  @ResponseMessage('🎉 Category Delete successfully!')
-  async delete(@Body() deleteCategoryDto: DeleteCategoryDto) {
-    return this.categoryService.delete(deleteCategoryDto);
+  @ApiResponse({ status: 201, description: 'SubCategory successfully created' })
+  @ApiResponse({ status: 409, description: 'SubCategory already exists' })
+  @ResponseMessage('🎉 SubCategory Delete successfully!')
+  async delete(@Body() deleteSubCategoryDto: DeleteSubCategoryDto) {
+    return this.subCategoryService.delete(deleteSubCategoryDto);
   }
 }

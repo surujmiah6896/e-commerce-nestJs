@@ -1,4 +1,4 @@
-import { SubCategory } from 'src/modules/subCategory/entities/sub-category.entity';
+import { SubCategory } from '../../subCategory/entities/sub-category.entity';
 import {
   Entity,
   Column,
