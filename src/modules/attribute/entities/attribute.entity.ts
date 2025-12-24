@@ -1,10 +1,12 @@
+import { Variant } from '../../variant/entities/variant.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn
+  DeleteDateColumn,
+  OneToMany
 } from 'typeorm';
 
 
@@ -30,6 +32,13 @@ export class Attribute {
 
   @Column({ default: true })
   isActive: boolean;
+
+  // Relation to subcategories (if using separate table)
+  @OneToMany(() => Variant, (variant) => variant.attribute, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  variants: Variant[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -3,11 +3,11 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
 import { CreateVariantDto, UpdateVariantDto } from './dto/create-variant.dto';
 import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
-import { DeleteVariantDto } from './dto/delete-variant.dto';
 import { VariantService } from './variant.service';
+import { DeleteVariantDto } from './dto/delete-variant.dto';
 
-@ApiTags('Variant')
-@Controller('Variant')
+@ApiTags('variant')
+@Controller('variant')
 export class VariantController {
   constructor(private readonly variantService: VariantService) {}
 
@@ -107,5 +107,5 @@ export class VariantController {
   @ResponseMessage('🎉 Variant Delete successfully!')
   async delete(@Body() deleteVariantDto: DeleteVariantDto) {
     return this.variantService.delete(deleteVariantDto);
-  }
+  } 
 }

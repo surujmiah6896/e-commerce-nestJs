@@ -21,6 +21,7 @@ import { GlobalModule } from './shared/global/global.module';
 import { SubCategoryModule } from './modules/subCategory/sub-category.module';
 import { BrandModule } from './modules/brand/brand.module';
 import { AttributeModule } from './modules/attribute/attribute.module';
+import { VariantModule } from './modules/variant/variant.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { AttributeModule } from './modules/attribute/attribute.module';
     GlobalModule,
     BrandModule,
     AttributeModule,
+    VariantModule,
 
     // 6. Your Feature Modules
     // HealthModule,

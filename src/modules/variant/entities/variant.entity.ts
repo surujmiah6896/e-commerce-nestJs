@@ -1,10 +1,13 @@
+import { Attribute } from '../../attribute/entities/attribute.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn
+  DeleteDateColumn,
+  ManyToOne,
+  JoinColumn
 } from 'typeorm';
 
 
@@ -12,6 +15,12 @@ import {
 export class Variant {
   @PrimaryGeneratedColumn()
   id: string;
+
+  @ManyToOne(() => Attribute, (attribute) => attribute.variants, {
+    onDelete: 'CASCADE', // Delete variant if attribute is deleted
+  })
+  @JoinColumn({ name: 'attribute_id' })
+  attribute: Attribute;
 
   @Column({ unique: true })
   name: string;

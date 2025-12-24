@@ -10,13 +10,13 @@ import { DeleteVariantDto } from './dto/delete-variant.dto';
 export class VariantService {
   constructor(
     @InjectRepository(Variant)
-    private readonly VariantRepository: Repository<Variant>,
+    private readonly variantRepository: Repository<Variant>,
     private readonly helperService: HelperService,
   ) {}
 
   // Create new Variant
   async create(createVariantDto: CreateVariantDto): Promise<Variant> {
-    const existingByName = await this.VariantRepository.findOne({
+    const existingByName = await this.variantRepository.findOne({
       where: { name: createVariantDto.name },
     });
 
@@ -26,11 +26,11 @@ export class VariantService {
       );
     }
 
-    const Variant = this.VariantRepository.create({
+    const Variant = this.variantRepository.create({
       ...createVariantDto,
     });
 
-    return await this.VariantRepository.save(Variant);
+    return await this.variantRepository.save(Variant);
   }
 
   //get all Variant
@@ -92,8 +92,7 @@ export class VariantService {
     }
 
     // Build query with caching
-    const queryBuilder =
-      this.VariantRepository.createQueryBuilder('Variant');
+    const queryBuilder = this.variantRepository.createQueryBuilder('Variant');
 
     // Apply where conditions
     if (Object.keys(whereConditions).length > 0) {
@@ -140,7 +139,7 @@ export class VariantService {
 
   //show Variant
   async show(id: string): Promise<Variant> {
-    const Variant = await this.VariantRepository.findOne({
+    const Variant = await this.variantRepository.findOne({
       where: { id },
     });
 
@@ -152,7 +151,7 @@ export class VariantService {
 
   //status Variant
   async status(id: string): Promise<Variant> {
-    const Variant = await this.VariantRepository.findOne({
+    const Variant = await this.variantRepository.findOne({
       where: { id },
     });
 
@@ -161,7 +160,7 @@ export class VariantService {
     }
 
     Variant.isActive = !Variant.isActive;
-    return await this.VariantRepository.save(Variant);
+    return await this.variantRepository.save(Variant);
   }
 
   //update Variant
@@ -169,13 +168,13 @@ export class VariantService {
     id: string,
     updateVariantDto: UpdateVariantDto,
   ): Promise<Variant> {
-    const Variant = await this.VariantRepository.findOne({ where: { id } });
+    const Variant = await this.variantRepository.findOne({ where: { id } });
 
     if (!Variant) {
       throw new NotFoundException(`Variant with ID ${id} not found`);
     }
 
-    const existingBySlug = await this.VariantRepository.findOne({
+    const existingBySlug = await this.variantRepository.findOne({
       where: { name: updateVariantDto.name },
     });
 
@@ -187,13 +186,13 @@ export class VariantService {
 
     Object.assign(Variant, updateVariantDto);
 
-    return await this.VariantRepository.save(Variant);
+    return await this.variantRepository.save(Variant);
   }
 
   //delete Variant
   async delete(deleteVariantDto: DeleteVariantDto): Promise<Variant> {
     const { id, force } = deleteVariantDto;
-    const Variant = await this.VariantRepository.findOne({
+    const Variant = await this.variantRepository.findOne({
       where: { id },
     });
 
@@ -202,9 +201,9 @@ export class VariantService {
     }
     
     if (force) {
-      await this.VariantRepository.delete(id);
+      await this.variantRepository.delete(id);
     } else {
-      await this.VariantRepository.softDelete(id);
+      await this.variantRepository.softDelete(id);
     }
     return Variant;
   }
