@@ -38,24 +38,23 @@ export class CategoryService {
   async update(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
+  ) {
     const category = await this.categoryRepository.findOne({ where: { id } });
 
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
-        const slug = this.helperService.generateSlug(updateCategoryDto.name);
-      // Check for duplicate name (excluding current category)
-      const existingBySlug = await this.categoryRepository.findOne({
-        where: { name: slug },
-      });
+    const slug = this.helperService.generateSlug(updateCategoryDto.name);
+    const existingBySlug = await this.categoryRepository.findOne({
+      where: { name: slug },
+    });
 
-      if (existingBySlug && existingBySlug.id !== id) {
-        throw new ConflictException(
-          `Category with name "${updateCategoryDto.name}" already exists`,
-        );
-      }
+    if (existingBySlug && existingBySlug.id !== id) {
+      throw new ConflictException(
+        `Category with name "${updateCategoryDto.name}" already exists`,
+      );
+    }
 
     if (
       !updateCategoryDto.slug &&
@@ -66,7 +65,6 @@ export class CategoryService {
         updateCategoryDto.slug = slug;
     }
 
-    // 5. Update category
     Object.assign(category, updateCategoryDto);
 
     return await this.categoryRepository.save(category);
