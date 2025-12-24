@@ -1,4 +1,4 @@
-import { SubCategory } from 'src/modules/subCategory/entities/sub-category.entity';
+import { Category } from 'src/modules/category/entities/category.entity';
 import {
   Entity,
   Column,
@@ -6,14 +6,21 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 
-@Entity('categories')
-export class Category {
+@Entity('sub_categories')
+export class SubCategory {
   @PrimaryGeneratedColumn()
   id: string;
+
+  @ManyToOne(() => Category, (category) => category.subCategories, {
+    onDelete: 'CASCADE', // Delete subcategory if category is deleted
+  })
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 
   @Column({ unique: true })
   name: string;
@@ -50,13 +57,6 @@ export class Category {
 
   @Column({ nullable: true })
   metaContent: string;
-
-  // Relation to subcategories (if using separate table)
-  @OneToMany(() => SubCategory, (subCategory) => subCategory.category, {
-    cascade: true, 
-    onDelete: 'CASCADE', 
-  })
-  subCategories: SubCategory[];
 
   @CreateDateColumn()
   createdAt: Date;
